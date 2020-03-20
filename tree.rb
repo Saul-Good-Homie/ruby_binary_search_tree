@@ -89,6 +89,7 @@ class Tree
     end
   end
 
+  # recursive version of level_order
   def level_order_rec(current=@root, result=[], queue=[], &block)
     # if a block was given, yield the current value to the block
     if block_given?
@@ -116,31 +117,41 @@ class Tree
   end
 
   # Extra Bonus challenge
+  # first define an array with the names of the functions to be defined
   ORDERS = ['preorder', 'inorder', 'postorder']
   ORDERS.each do |method|
+    # define_method takes a string for the name of the new function and a
+    # block that has the arguments to the function as arguments itself
+    # (the things between the pipe characters)
     define_method "#{method}" do |current=@root, result=[], &block|
       # base case
       return if current == nil
 
-      # if order is preorder, yield before the calls
+      # if order is preorder, yield before the recursive calls
       if method == ORDERS[0]
         block ? block.call(current.value) : result << current.value
       end
 
+      # the send method executes a method that is specified by the first
+      # argument to the send method. It can be a string or a symbol
+      # I believe self is the instance of the tree that calls the method.
+      # The rest of the arguments to the send call are the parameters that
+      # get passed to the call of 'method'
       self.send(method, current.left, result, &block)
 
-      # if order is inorder, yield between the calls
+      # if order is inorder, yield between the recursive calls
       if method == ORDERS[1]
         block ? block.call(current.value) : result << current.value
       end
 
       self.send(method, current.right, result, &block)
 
-      # if order is postorder, yield after the calls
+      # if order is postorder, yield after the recursive calls
       if method == ORDERS[2]
         block ? block.call(current.value) : result << current.value
       end
 
+      # return either nil or the result-array
       block ? nil : result
     end
   end
